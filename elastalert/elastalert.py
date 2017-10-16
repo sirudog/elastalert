@@ -639,12 +639,14 @@ class ElastAlerter():
 
     def set_starttime(self, rule, endtime):
         """ Given a rule and an endtime, sets the appropriate starttime for it. """
+        print "Using endtime", endtime
 
         # This means we are starting fresh
         if 'starttime' not in rule:
             # Try to get the last run from Elasticsearch
             last_run_end = self.get_starttime(rule)
             if last_run_end:
+                print "Found previous run, using starttime and setting mimimum to", last_run_end
                 rule['starttime'] = last_run_end
                 self.adjust_start_time_for_overlapping_agg_query(rule)
                 self.adjust_start_time_for_interval_sync(rule, endtime)
@@ -659,12 +661,15 @@ class ElastAlerter():
             # If we started using a previous run, don't go past that
             if 'minimum_starttime' in rule and rule['minimum_starttime'] > buffer_delta:
                 rule['starttime'] = rule['minimum_starttime']
+                print "Overlapped with minimum, using", rule['starttime']
             # If buffer_time doesn't bring us past the previous endtime, use that instead
             elif 'previous_endtime' in rule:
                 if rule['previous_endtime'] < buffer_delta:
                     rule['starttime'] = rule['previous_endtime']
+                    print "Starting from previous endtime", rule['starttime']
                 self.adjust_start_time_for_overlapping_agg_query(rule)
             else:
+                print "Using endtime - buffer_time", buffer_delta
                 rule['starttime'] = buffer_delta
 
             self.adjust_start_time_for_interval_sync(rule, endtime)
