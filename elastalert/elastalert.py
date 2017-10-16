@@ -640,6 +640,7 @@ class ElastAlerter():
     def set_starttime(self, rule, endtime):
         """ Given a rule and an endtime, sets the appropriate starttime for it. """
         print "Using endtime", endtime
+        print rule
 
         # This means we are starting fresh
         if 'starttime' not in rule:
